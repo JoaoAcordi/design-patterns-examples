@@ -1,26 +1,35 @@
-// Interface interna do sistema
-class Notifier {
-  send(message) {
-    console.log(`Notificação enviada: ${message}`);
+class PaymentProcessor {
+  processPayment(amount) {
+    console.log(`Pagamento de R$${amount} processado.`);
   }
 }
 
-// Biblioteca externa (incompatível com o sistema)
-class SMSService {
-  sendSMS(text) {
-    console.log(`SMS enviado: ${text}`);
+class ExternalPaymentService {
+  makeTransaction(value) {
+    console.log(
+      `Transação realizada no valor de R$${value} com serviço externo.`
+    );
   }
 }
 
-// Cliente
-function notifyUser(notifier, message) {
-  notifier.send(message);
+class ExternalPaymentAdapter extends PaymentProcessor {
+  constructor(externalService) {
+    super();
+    this.externalService = externalService;
+  }
+
+  processPayment(amount) {
+    this.externalService.makeTransaction(amount);
+  }
 }
 
-// Testando com o Notifier interno
-const emailNotifier = new Notifier();
-notifyUser(emailNotifier, "Bem-vindo ao sistema!");
+function payOrder(processor, amount) {
+  processor.processPayment(amount);
+}
 
-// Tentando usar o SMSService diretamente (vai falhar)
-const smsService = new SMSService();
-// notifyUser(smsService, "Seu código é 1234");
+const processor = new PaymentProcessor();
+payOrder(processor, 100);
+
+const externalService = new ExternalPaymentService();
+const adaptedService = new ExternalPaymentAdapter(externalService);
+payOrder(adaptedService, 200);
